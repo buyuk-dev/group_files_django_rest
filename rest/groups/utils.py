@@ -5,55 +5,70 @@ from typing import Optional
 from .defaults import DELIMITERS
 
 
-def get_split_pattern(delimiters=None):
-    """
-    Combine all delimiter characters into one regex pattern.
-    """
+def unify_delimiters(string, delimiters=None):
+    delimiters = delimiters or DELIMITERS
+    pattern = f"[{re.escape(delimiters)}]"
+    return re.sub(pattern, re.escape(delimiters[0]), string)
+
+
+def calculate_common_prefix(s1, s2, delimiter):
+    prefix = []
+    for a, b in zip(s1.split(delimiter), s2.split(delimiter)):
+        if a == b:
+            prefix.append(a)
+        else:
+            break
+    return len(prefix), delimiter.join(prefix)
+
+
+def group_strings(strings, delimiters=None):
     delimiters = delimiters or DELIMITERS
 
-    # '+' to avoid empty groups when multiple delim in sequence.
-    pattern = f"[{delimiters}]+"
+    groups = []
+    if len(strings) == 0: return groups
 
-    return pattern
+    # Unify delimiters within strings.
+    unified = list(set(unify_delimiters(s) for s in strings))
+    delimiter = delimiters[0]
 
+    # Sort to build optimal groups.
+    unified.sort()
 
-def split_string(input_string, delimiters=None):
-    """
-    Split string on each of the delimiters.
-    """
-    delimiters = delimiters or DELIMITERS
-    pattern = get_split_pattern(delimiters)
+    # Initialize current group with first item on the list.
+    first, strings = unified[0], unified[1:]
+    current_group_strings, current_group_name = [first], first
+    current_prefix_length = current_group_name.count(delimiter) + 1
 
-    # It is possible to get empty parts at the beginning and end
-    # when string starts or ends with a sequence of delimiters.
-    return filter(lambda x: len(x) > 0, re.split(pattern, input_string))
+    while len(strings) > 0:
+        first, strings = strings[0], strings[1:]
+    
+        # should add first to current group or create new one?
+        common_prefix_length, common_prefix = calculate_common_prefix(first, current_group_name, delimiter)
 
+        # add if common prefix length between first and current_group_name is greater than 50%
+        if common_prefix_length > 0.5 * current_prefix_length:
+            current_group_strings.append(first)
+            current_group_name = common_prefix
+            current_prefix_length = common_prefix_length
 
-def vectorize_string(input_string, delimiters=None):
-    """
-    Assign unique integer to every unique part of the string.
-    """
-    pass
-
-
-def compute_groups(strings, delimiters=None):
-    """
-    Groups strings from the input list into most descriptive groups by common prefixes.
-    Returns dict where key is the group prefix and value is a list of strings in the group.
-    """
-    delimiters = delimiters or DELIMITERS
-    groups = defaultdict(list)
-
-    s: str
-    for s in strings:
-        prefix, _ = s.rsplit(delimiters[1], maxsplit=1)
-        groups[prefix].append(s)
+        # otherwise append current group to solution and create new group.
+        else:
+            groups.append({
+                current_group_name: current_group_strings
+            })
+            current_group_strings = [first]
+            current_group_name = first
+            current_prefix_length = current_group_name.count(delimiter) + 1
 
     return groups
 
 
-def group_files(files:'list[str]', delimiters:'Optional[str]' = None) -> 'dict[str, list[str]]':
-    """
-    Placeholder for goruping algorithm.
-    """
-    return compute_groups(files, delimiters)
+if __name__ == '__main__':
+    strings = None
+    with open("C:\\Users\\buyuk\\Downloads\\names.csv") as data_file:
+        strings  = [line.strip() for line in data_file]
+
+    from pprint import pprint
+    groups = group_strings(strings, "_")
+    for group in groups:
+        pprint(group)
