@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends gcc libpq-dev \
 RUN pip install pipenv
 
 # Copy the Pipfile and Pipfile.lock into the container at /app/
-COPY Pipfile Pipfile.lock key.pem /app/
+COPY Pipfile Pipfile.lock key.pem cert.pem /app/
 
 # Install project dependencies
 RUN pipenv install --deploy --ignore-pipfile
@@ -29,7 +29,7 @@ COPY ./rest /app/
 RUN pipenv run python manage.py collectstatic --noinput
 
 # Make port 8000 available to the world outside this container
-EXPOSE 8000
+EXPOSE 443
 
 # Start Gunicorn
-CMD ["pipenv", "run", "gunicorn", "--certificate key.pem", "rest.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["pipenv", "run", "gunicorn", "--certfile", "/app/cert.pem", "--keyfile", "/app/key.pem", "rest.wsgi:application", "--bind", "0.0.0.0:443"]
