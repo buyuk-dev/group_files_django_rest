@@ -7,7 +7,7 @@ from drf_yasg.utils import swagger_auto_schema
 
 from .models import Folder, File
 from .serializers import FolderSerializer, FileSerializer, GroupFilesSerializer
-from .utils import group_files
+from .utils import group_strings as group_files
 from .defaults import DELIMITERS
 
 

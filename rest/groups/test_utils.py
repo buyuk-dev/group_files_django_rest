@@ -3,10 +3,10 @@ from .utils import group_strings
 
 
 @pytest.mark.parametrize("dataset", [
-    "C:\\Users\\buyuk\\Downloads\\names_dup_1.csv",
-    "C:\\Users\\buyuk\\Downloads\\names_dup_10.csv",
-    "C:\\Users\\buyuk\\Downloads\\names_dup_100.csv",
-    "C:\\Users\\buyuk\\Downloads\\names_dup_1000.csv"
+    "datasets/names_dup_1.csv",
+    "datasets/names_dup_10.csv",
+    "datasets/names_dup_100.csv",
+    "datasets/names_dup_1000.csv"
 ])
 def test_example_dataset(dataset):
     strings = None
