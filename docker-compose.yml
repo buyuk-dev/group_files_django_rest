@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    command: pipenv run gunicorn --certfile cert.pem --keyfile key.pem rest.wsgi:application --bind 0.0.0.0:443
+    volumes:
+      - .:/app
+    ports:
+      - "443:443"
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app/rest
+
+volumes:
+  static_volume:
