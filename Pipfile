@@ -10,6 +10,7 @@ drf-yasg = "*"
 djangorestframework-simplejwt = "*"
 gunicorn = "*"
 whitenoise = "*"
+django-sslserver = "*"
 
 [dev-packages]
 pytest = "*"
